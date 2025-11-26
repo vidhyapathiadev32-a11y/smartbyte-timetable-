@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartByte Timetable Generator</title>
+
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background: #f4f7ff;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2f4cff;
+        }
+
+        .sub {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #e7edff;
+            font-weight: bold;
+        }
+
+        input {
+            width: 95%;
+            padding: 8px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #downloadBtn, #shareBtn {
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background: #2f4cff;
+            color: white;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        #shareLinkBox {
+            margin-top: 15px;
+            display: none;
+        }
+
+        #shareLink {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #777;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>SmartByte Timetable Generator</h1>
+    <div class="sub">Create • Download • Share</div>
+
+    <div id="timetableArea">
+        <table id="timetable">
+            <tr>
+                <th>Day / Period</th>
+                <th>P1</th>
+                <th>P2</th>
+                <th>P3</th>
+                <th>P4</th>
+                <th>P5</th>
+                <th>P6</th>
+                <th>P7</th>
+                <th>P8</th>
+            </tr>
+
+            <script>
+                const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+                for (let d of days) {
+                    document.write(`<tr><th>${d}</th>`);
+                    for (let p=1; p<=8; p++) {
+                        document.write(`<td><input id="${d}_${p}"></td>`);
+                    }
+                    document.write("</tr>");
+                }
+            </script>
+        </table>
+    </div>
+
+    <button id="downloadBtn" onclick="downloadPDF()">Download PDF</button>
+    <button id="shareBtn" onclick="generateLink()">Generate Share Link</button>
+
+    <div id="shareLinkBox">
+        <p><b>Copy this link:</b></p>
+        <input id="shareLink" readonly>
+    </div>
+
+    <div class="footer">
+        Powered by SmartByte • Created by Vid
+    </div>
+
+</div>
+
+<script>
+    function downloadPDF() {
+        const element = document.getElementById("timetableArea");
+
+        const opt = {
+            margin: 10,
+            filename: 'SmartByte_Timetable.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    }
+
+    function generateLink() {
+        let params = "";
+
+        const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+        for (let d of days) {
+            for (let p=1; p<=8; p++) {
+                let val = document.getElementById(`${d}_${p}`).value;
+                params += `${encodeURIComponent(d+"_"+p)}=${encodeURIComponent(val)}&`;
+            }
+        }
+
+        const url = `${window.location.origin}${window.location.pathname}?${params}`;
+
+        document.getElementById("shareLink").value = url;
+        document.getElementById("shareLinkBox").style.display = "block";
+    }
+
+    function loadFromURL() {
+        const params = new URLSearchParams(window.location.search);
+
+        params.forEach((value, key) => {
+            const input = document.getElementById(key);
+            if (input) input.value = value;
+        });
+    }
+
+    loadFromURL();
+</script>
+
+</body>
+</html> 
